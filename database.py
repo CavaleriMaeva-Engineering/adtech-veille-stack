@@ -1,19 +1,9 @@
-import psycopg2
-from psycopg2.extras import RealDictCursor 
-
-#config de la connexion postegreSQL (local ou DO)
-DB_CONFIG = {
-    "host": "localhost",
-    "database": "postgres",
-    "user": "postgres",
-    "password": "password",
-    "port": 5432
-}
+import sqlite3
 
 #fonction d'ouverture de connexion
 def get_db_connection():
-    """ouvre et renvoie une connexion à la bdd"""
-    conn = psycopg2.connect(**DB_CONFIG, cursor_factory=RealDictCursor)
+    conn = sqlite3.connect("adtech_alerts.db")
+    conn.row_factory = sqlite3.Row  #permet d'accéder aux colonnes par leur nom
     return conn
     
 def init_db():
@@ -36,6 +26,6 @@ def init_db():
         conn.commit()
         cursor.close()
         conn.close()
-        print("Table 'competitor_alerts' initilaisée avec succès dans PostegreSQL")
+        print("Table 'competitor_alerts' initilaisée avec succès")
     except Exception as e :
         print(f"Connexion Postres échouée : {e}")

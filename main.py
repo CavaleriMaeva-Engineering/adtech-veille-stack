@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, HttpUrl
 from datetime import datetime
 from database import get_db_connection, init_db
@@ -14,7 +14,7 @@ def startup_event():
 #définition du contrat de données (schéma pydantic)
 class CompetitorAlert(BaseModel):
     competitor_name: str = Field(..., description="Nom du concurrent")
-    ad_title: HttpUrl = Field(..., description="Titre de la publicité ou du produit")
+    ad_title: str = Field(..., description="Titre de la publicité ou du produit")
     ad_url: HttpUrl = Field(..., description="URL de l'annonce")
     price_detected: float = Field(..., gt=0, description="Prix détecté (doit être >0)")
     source: str = Field(default="apify_scraper", description="Origine de la donnée")
@@ -30,12 +30,12 @@ def receive_alert(alert: CompetitorAlert) :
     #pydantic a déjà validé le json entrant ici
     insert_query="""
     INSERT INTO competitor_alerts(competitor_name, ad_title, ad_url, price_detected, source)
-    VALUES (%s, %s, %s, %s, %s) 
+    VALUES (?, ?, ?, ?, ?) 
     RETURNING id, created_at;
     """
     try : 
         #ouvre la connexion à postgres et instancie le curseur
-        conn = get_db_connection
+        conn = get_db_connection()
         cursor = conn.cursor()
         #exécute la requête en passant les param sous forme de tuple pour que psycopg2 les sécurise
         cursor.execute(insert_query, (
@@ -45,7 +45,7 @@ def receive_alert(alert: CompetitorAlert) :
             alert.price_detected,
             alert.source
         ))
-        result = cursor.fetchone() #récupère la ligne renvoyée par le RETURNING id...
+        inserted_id = cursor.lastrowid
         conn.commit() #valide définitivement l'insertion en bdd
         #ferme les ressources réseau 
         cursor.close()
@@ -55,8 +55,7 @@ def receive_alert(alert: CompetitorAlert) :
         return {
             "status": "success",
             "message": "alerte de veille enregistrée en base PostgreSQL",
-            "inserted_id": result["id"],
-            "created_at": result["created_at"]
+            "inserted_id": inserted_id
         }
     #si la bdd inaccessible ou que la requête échoue on renvoie une erreur 500
     except Exception as e:
