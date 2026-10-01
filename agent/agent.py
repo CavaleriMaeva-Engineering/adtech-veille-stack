@@ -29,7 +29,7 @@ class AdTechReActAgent :
 
         #Initialisation du client officiel Google GenAI
         self.client = genai.Client(api_key=api_key)
-        self.model_name = "gemini-2.0-flash"
+        self.model_name = "gemini-3.8-flash"
         self.guardrail = AgentGuardrail(max_iterations=max_iterations)
 
     def run(self, user_query: str) :
