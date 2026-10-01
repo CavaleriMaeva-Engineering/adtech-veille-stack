@@ -29,7 +29,7 @@ class AdTechReActAgent :
 
         #Initialisation du client officiel Google GenAI
         self.client = genai.Client(api_key=api_key)
-        self.model_name = "gemini-2.5-flash"
+        self.model_name = "gemini-2.0-flash"
         self.guardrail = AgentGuardrail(max_iterations=max_iterations)
 
     def run(self, user_query: str) :
@@ -67,7 +67,7 @@ class AdTechReActAgent :
 
                     #passage par le garde-fou d'action
                     try :
-                        self.guardrails.check_execution_limits(tool_name, tool_args)
+                        self.guardrail.check_execution_limits(tool_name, tool_args)
                     except GuardrailException as e :
                         print(f"\n INTERCEPTION GARDE-FOU : {e}\n")
                         return
@@ -88,13 +88,13 @@ class AdTechReActAgent :
             else :
                 #Réponse finale de l'agent 
                 final_text = response.text
-                final_res = self.guardrails.validate_output(final_text, source_data_exists=True)
+                final_res = self.guardrail.validate_output(final_text, source_data_exists=True)
                 print(f"RÉPONSE FINALE : {final_res}\n")
                 return final_res
 
 if __name__=="__main__":
     agent = AdTechReActAgent()
-    agent.run("Analyse les statistiques du concurrent Nike et extrait les dernières alertes.")
+    agent.run("Analyse les statistiques du concurrent Nike, extrait les dernières alertes et envoie-les sur Slack.")
 
 
 
