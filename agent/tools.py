@@ -19,7 +19,7 @@ def get_competitor_stats(competitor_name: str) -> Dict[str, Any]:
 
     #requête sql d'agrégation :
     query = """
-    SELECT COUNT(*), AVG(price_detcted), MIN(price_detected), MAX(price_detected)
+    SELECT COUNT(*), AVG(price_detected), MIN(price_detected), MAX(price_detected)
     FROM competitor_alerts
     WHERE LOWER(competitor_name) LIKE LOWER(?)
     """
@@ -71,7 +71,7 @@ def get_recent_alerts(limit: int = 5) -> List[Dict[str, Any]]:
     return alerts
 
 #fonction qui donne à l'agent la capcité d'interagir avec l'extérieur en postant des alertes sur slack
-def send_slack_report(report_text: str) -> Dict[str, str]:
+def send_slack_report(message: str) -> Dict[str, str]:
     """
     Envoie un rapport synthétique ou une alerte sur le canal Slack de l'équipe.
     """
@@ -80,7 +80,7 @@ def send_slack_report(report_text: str) -> Dict[str, str]:
         return {"status": "error", "message": "Variable SLACK_WEBHOOK_URL non configurée."}
 
     #payload prépare l'objet JSON au format attendu par slack
-    payload = {"text": f"🤖 *Rapport Agent IA AdTech* :\n{report_text}"}
+    payload = {"text": f"🤖 *Rapport Agent IA AdTech* :\n{message}"}
     response = requests.post(webhook_url, json=payload) 
 
     if response.status_code == 200:
