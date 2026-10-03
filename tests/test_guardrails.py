@@ -33,5 +33,5 @@ def test_execution_limits_duplicate_loop():
 def test_validate_output_hallucination():
     """Vérifie que le garde-fou de sortie bloque les prix si aucune donnée n'existe."""
     guardrail = AgentGuardrail()
-    with pytest.raises(GuardrailException, match="Hallucination"):
+    with pytest.raises(GuardrailException, match="hallucination"):
         guardrail.validate_output("Le prix est de 49.99 €", source_data_exists=False)
