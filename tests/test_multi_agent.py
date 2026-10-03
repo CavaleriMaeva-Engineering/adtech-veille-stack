@@ -6,7 +6,7 @@ from agent.multi_agent import AdTechMultiAgentSystem
 
 @patch.dict(os.environ, {"GROQ_API_KEY": "gsk_dummy_test_key_for_pytest"})
 @patch("groq.Groq")
-def test_supervisor_node_routing_to_scraper(mock_groq_class, mock_env):
+def test_supervisor_node_routing_to_scraper(mock_groq_class):
     """
     Vérifie que le Superviseur renvoie correctement 'scraper_agent'
     lorsque la BDD n'a pas encore été consultée.
@@ -29,7 +29,7 @@ def test_supervisor_node_routing_to_scraper(mock_groq_class, mock_env):
 
 @patch.dict(os.environ, {"GROQ_API_KEY": "gsk_dummy_test_key_for_pytest"})
 @patch("groq.Groq")
-def test_route_supervisor_end(mock_groq_class, mock_env):
+def test_route_supervisor_end(mock_groq_class):
     """Vérifie le routage vers END quand la mission est marquée terminée."""
     agent_system = AdTechMultiAgentSystem()
     state = {"next": "__end__"}
